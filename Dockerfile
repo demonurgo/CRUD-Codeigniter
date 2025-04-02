@@ -22,8 +22,10 @@ RUN a2enmod rewrite headers deflate expires
 # Configurar o DocumentRoot do Apache para o diretório public do CodeIgniter
 RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
 
-# Instalar Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Instalar Composer - método alternativo
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+    && php composer-setup.php --install-dir=/usr/bin --filename=composer \
+    && php -r "unlink('composer-setup.php');"
 
 # Definir diretório de trabalho
 WORKDIR /var/www/html
