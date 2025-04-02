@@ -1,0 +1,39 @@
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - crud-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    image: postgres:14
+    ports:
+      - "5433:5433"
+    environment:
+      POSTGRES_DB: crud_db
+      POSTGRES_USER: crud_user
+      POSTGRES_PASSWORD: crud_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - crud-network
+
+networks:
+  crud-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
